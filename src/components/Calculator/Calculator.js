@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import _ from 'lodash';
 import { CalculatorWrapper, Display, ButtonsWrapper, BackSpaceIcon } from './Styled';
 import Button from './../../shared/Button';
@@ -8,7 +8,6 @@ import Input from './../../shared/Input';
 const Calculator = () => {
     const [inputValue, setInputValue] = useState('');
     const [resultValue, setResultValue] = useState('');
-    const [result, setResult] = useState([])
 
     const buttonsData = [
         { value: 'AC', backgroundColor: 'lightgrey' },
@@ -33,25 +32,33 @@ const Calculator = () => {
     ];
 
     const inputValueChangeHandler = (id, val) => {
+        let charNaN = '';
         let newInputValue = inputValue + val;
+
         if (val !== '=') {
 
             setInputValue(newInputValue);
+
             switch (true) {
-                case /\+/.test(newInputValue):
+                case /\+/.test(newInputValue.substring(0, newInputValue.length - 1)):
                     let sum = newInputValue.split('+').reduce((a, b) => (+a) + (+b), 0).toString();
                     setResultValue(sum);
-                    let charNaN = '';
                     if (sum === 'NaN') {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
-                        console.log(newInputValue,sum, charNaN,newInputValue.substring(1, newInputValue.length - 1), 'charNan')
                         sum = newInputValue.substring(0, newInputValue.length - 1).split('+').reduce((a, b) => (+a) + (+b), 0).toString();
                         setInputValue(sum + charNaN);
                         setResultValue(sum);
                     }
                     break;
                 case /\-/.test(newInputValue):
-                    setResultValue(_.reduce(newInputValue.split('-'), (a, b) => a - b));
+                    let sub = _.reduce(newInputValue.split('-'), (a, b) => a - b).toString();
+                    setResultValue(sub);
+                    if (sub === 'NaN') {
+                        charNaN = newInputValue.charAt(newInputValue.length - 1);
+                        sub = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('-'), (a, b) => a - b).toString();
+                        setInputValue(sub + charNaN);
+                        setResultValue(sub);
+                    }
                     break;
                 case /\*/.test(newInputValue):
                     setResultValue(newInputValue.split('*').reduce((a, b) => a * b, 1));
@@ -68,8 +75,6 @@ const Calculator = () => {
             } else {
                 setInputValue(resultValue);
                 setResultValue('');
-                // dispatch(saveResult(resultValue));
-                setResult([].push(resultValue))
             }
         }
         if (val === 'AC') {
@@ -81,7 +86,7 @@ const Calculator = () => {
             // setResultValue('');
         }
     }
-
+    // console.log(inputValue, resultValue, 'before render')
     return (
         <>
             <h1>Calculator</h1>
