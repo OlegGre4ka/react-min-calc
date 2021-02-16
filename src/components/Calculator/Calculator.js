@@ -10,28 +10,28 @@ const Calculator = () => {
     const [resultValue, setResultValue] = useState('');
 
     const buttonsData = [
-        { value: 'AC', backgroundColor: 'lightgrey' },
-        { id: 2, value: <BackSpaceIcon /> },
-        { value: '%' },
-        { value: '/', borderColor: 'orange' },
-        { value: '7' },
-        { value: '8' },
-        { value: '9' },
-        { value: '*', borderColor: 'orange' },
-        { value: '4' },
-        { value: '5' },
-        { value: '6' },
-        { value: '-', borderColor: 'orange' },
-        { value: '1' },
-        { value: '2' },
-        { value: '3' },
-        { value: '+', borderColor: 'orange' },
-        { value: '.' },
-        { value: '0' },
-        { value: '=', backgroundColor: 'orange', borderColor: 'black', width: '160px' },
+        { value: 'AC', code: 46, backgroundColor: 'lightgrey' },
+        { value: <BackSpaceIcon />, code: 8, },
+        { value: '%', code: 48 },
+        { value: '/', code: 111, borderColor: 'orange' },
+        { value: '7', code: 103 },
+        { value: '8', code: 104 },
+        { value: '9', code: 105 },
+        { value: '*', code: 106, borderColor: 'orange' },
+        { value: '4', code: 100 },
+        { value: '5', code: 101 },
+        { value: '6', code: 102 },
+        { value: '-', code: 109, borderColor: 'orange' },
+        { value: '1', code: 97 },
+        { value: '2', code: 98 },
+        { value: '3', code: 99 },
+        { value: '+', code: 107, borderColor: 'orange' },
+        { value: '.', code: 110 },
+        { value: '0', code: 96 },
+        { value: '=', code: 187, backgroundColor: 'orange', borderColor: 'black', width: '160px' },
     ];
 
-    const inputValueChangeHandler = (id, val) => {
+    const inputValueChangeHandler = (code, val) => {
         let charNaN = '';
         let newInputValue = inputValue + val;
 
@@ -41,30 +41,80 @@ const Calculator = () => {
 
             switch (true) {
                 case /\+/.test(newInputValue.substring(0, newInputValue.length - 1)):
-                    let sum = newInputValue.split('+').reduce((a, b) => (+a) + (+b), 0).toString();
-                    setResultValue(sum);
-                    if (sum === 'NaN') {
-                        charNaN = newInputValue.charAt(newInputValue.length - 1);
-                        sum = newInputValue.substring(0, newInputValue.length - 1).split('+').reduce((a, b) => (+a) + (+b), 0).toString();
-                        setInputValue(sum + charNaN);
+                    let sum = newInputValue.split('+').reduce((a, b) => (+a) + (+b), 0);
+                    if (/\./.test(sum)) {
+                        setResultValue(sum.toFixed(3));
+                    } else {
                         setResultValue(sum);
                     }
-                    break;
-                case /\-/.test(newInputValue):
-                    let sub = _.reduce(newInputValue.split('-'), (a, b) => a - b).toString();
-                    setResultValue(sub);
-                    if (sub === 'NaN') {
+                    if (Number.isNaN(sum)) {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
-                        sub = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('-'), (a, b) => a - b).toString();
-                        setInputValue(sub + charNaN);
-                        setResultValue(sub);
+                        sum = newInputValue.substring(0, newInputValue.length - 1).split('+').reduce((a, b) => (+a) + (+b), 0);
+                        if (/\./.test(sum)) {
+                            setInputValue(sum.toFixed(3) + charNaN);
+                            setResultValue(sum.toFixed(3));
+                        } else {
+                            setInputValue(sum + charNaN);
+                            setResultValue(sum);
+                        }
                     }
                     break;
-                case /\*/.test(newInputValue):
-                    setResultValue(newInputValue.split('*').reduce((a, b) => a * b, 1));
+                case /\-/.test(newInputValue.substring(0, newInputValue.length - 1)):
+                    let sub = _.reduce(newInputValue.split('-'), (a, b) => a - b);
+                    if (/\./.test(sub)) {
+                        setResultValue(sub.toFixed(3));
+                    } else {
+                        setResultValue(sub);
+                    }
+                    if (Number.isNaN(sub)) {
+                        charNaN = newInputValue.charAt(newInputValue.length - 1);
+                        sub = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('-'), (a, b) => a - b);
+                        if (/\./.test(sub)) {
+                            setInputValue(sub.toFixed(3) + charNaN);
+                            setResultValue(sub.toFixed(3));
+                        } else {
+                            setInputValue(sub + charNaN);
+                            setResultValue(sub);
+                        }
+                    }
                     break;
-                case /\//.test(newInputValue):
-                    setResultValue(_.reduce(newInputValue.split('/'), (a, b) => a / b));
+                case /\*/.test(newInputValue.substring(0, newInputValue.length - 1)):
+                    let multiple = newInputValue.split('*').filter(x => x.length !== 0).reduce((a, b) => a * b, 1);
+                    if (/\./.test(multiple)) {
+                        setResultValue(multiple.toFixed(3));
+                    } else {
+                        setResultValue(multiple);
+                    }
+                    if (Number.isNaN(multiple)) {
+                        charNaN = newInputValue.charAt(newInputValue.length - 1);
+                        multiple = newInputValue.substring(0, newInputValue.length - 1).split('*').reduce((a, b) => a * b, 1);
+                        if (/\./.test(multiple)) {
+                            setInputValue(multiple.toFixed(3) + charNaN);
+                            setResultValue(multiple.toFixed(3));
+                        } else {
+                            setInputValue(multiple + charNaN);
+                            setResultValue(multiple);
+                        }
+                    }
+                    break;
+                case /\//.test(newInputValue.substring(0, newInputValue.length - 1)):
+                    let divide = _.reduce(newInputValue.split('/').filter(x => x.length !== 0), (a, b) => a / b);
+                    if (/\./.test(divide)) {
+                        setResultValue(divide.toFixed(3));
+                    } else {
+                        setResultValue(divide);
+                    }
+                    if (divide === 'NaN' || Number.isNaN(divide)) {
+                        charNaN = newInputValue.charAt(newInputValue.length - 1);
+                        divide = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('/'), (a, b) => a / b);
+                        if (/\./.test(divide)) {
+                            setInputValue(divide.toFixed(3) + charNaN);
+                            setResultValue(divide.toFixed(3));
+                        } else {
+                            setInputValue(divide + charNaN);
+                            setResultValue(divide);
+                        }
+                    }
                     break;
             }
         }
@@ -81,10 +131,18 @@ const Calculator = () => {
             setInputValue('');
             setResultValue('');
         }
-        if (id === 2) {
+        if (code === 8) {
             setInputValue(inputValue.toString().substring(0, inputValue.toString().length - 1));
-            // setResultValue('');
         }
+    }
+
+    const keyDownHandler = e => {
+        console.log(e.keyCode, 'code')
+        buttonsData.forEach(button => {
+            if (e.keyCode === button.code) {
+                inputValueChangeHandler(button.code, button.value)
+            }
+        })
     }
     // console.log(inputValue, resultValue, 'before render')
     return (
@@ -94,12 +152,13 @@ const Calculator = () => {
                 <Display>
                     <div>
                         <Input height='40px' fontSize="25px" value={inputValue} />
-                        <Input height='30px' fontSize="18px" color="grey" value={resultValue === 'NaN' ? '' : resultValue} />
+                        <Input height='30px' fontSize="18px" color="grey" value={resultValue} />
                     </div>
                 </Display>
                 <ButtonsWrapper>
-                    {buttonsData.map(item => <Button key={item.value}
-                        onClick={() => inputValueChangeHandler(item.id, item.value)}
+                    {buttonsData.map(item => <Button key={item.code}
+                        onClick={() => inputValueChangeHandler(item.code, item.value)}
+                        onKeyDown={keyDownHandler}
                         width={item.width}
                         backgroundColor={item.backgroundColor}
                         borderColor={item.borderColor}>{item.value}</Button>)}

@@ -5,7 +5,8 @@ const Input = styled.input.attrs(
         {
             value: props.value,
             type: 'text',
-            readOnly: true
+            readOnly: true,
+            maxLength:16
         })
 )`
   width: 95%;
@@ -16,6 +17,10 @@ const Input = styled.input.attrs(
   font-weight: 500;
   text-align: right; 
   letter-spacing: 5px;
+
+  &:active, &:focus {
+    outline: none;
+}
 `
 
 export default Input
