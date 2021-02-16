@@ -33,9 +33,20 @@ const Calculator = () => {
 
     const inputValueChangeHandler = (code, val) => {
         let charNaN = '';
+
         let newInputValue = inputValue + val;
 
-        if (val !== '=') {
+        if (/\+\+/.test(newInputValue)
+            || /\-\-/.test(newInputValue)
+            || /\*\*/.test(newInputValue)
+            || /\/\//.test(newInputValue)
+            || /\%\%/.test(newInputValue)
+            || /\.\./.test(newInputValue)
+            || newInputValue.slice(0, 2) === '00') {
+            newInputValue = newInputValue.substring(0, inputValue.toString().length);
+        }
+
+        if (val !== '=' && code !== 8) {
 
             setInputValue(newInputValue);
 
@@ -43,7 +54,7 @@ const Calculator = () => {
                 case /\+/.test(newInputValue.substring(0, newInputValue.length - 1)):
                     let sum = newInputValue.split('+').reduce((a, b) => (+a) + (+b), 0);
                     if (/\./.test(sum)) {
-                        setResultValue(sum.toFixed(3));
+                        setResultValue(sum.toFixed(2));
                     } else {
                         setResultValue(sum);
                     }
@@ -51,8 +62,8 @@ const Calculator = () => {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
                         sum = newInputValue.substring(0, newInputValue.length - 1).split('+').reduce((a, b) => (+a) + (+b), 0);
                         if (/\./.test(sum)) {
-                            setInputValue(sum.toFixed(3) + charNaN);
-                            setResultValue(sum.toFixed(3));
+                            setInputValue(sum.toFixed(2) + charNaN);
+                            setResultValue(sum.toFixed(2));
                         } else {
                             setInputValue(sum + charNaN);
                             setResultValue(sum);
@@ -62,7 +73,7 @@ const Calculator = () => {
                 case /\-/.test(newInputValue.substring(0, newInputValue.length - 1)):
                     let sub = _.reduce(newInputValue.split('-'), (a, b) => a - b);
                     if (/\./.test(sub)) {
-                        setResultValue(sub.toFixed(3));
+                        setResultValue(sub.toFixed(2));
                     } else {
                         setResultValue(sub);
                     }
@@ -70,8 +81,8 @@ const Calculator = () => {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
                         sub = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('-'), (a, b) => a - b);
                         if (/\./.test(sub)) {
-                            setInputValue(sub.toFixed(3) + charNaN);
-                            setResultValue(sub.toFixed(3));
+                            setInputValue(sub.toFixed(2) + charNaN);
+                            setResultValue(sub.toFixed(2));
                         } else {
                             setInputValue(sub + charNaN);
                             setResultValue(sub);
@@ -81,7 +92,7 @@ const Calculator = () => {
                 case /\*/.test(newInputValue.substring(0, newInputValue.length - 1)):
                     let multiple = newInputValue.split('*').filter(x => x.length !== 0).reduce((a, b) => a * b, 1);
                     if (/\./.test(multiple)) {
-                        setResultValue(multiple.toFixed(3));
+                        setResultValue(multiple.toFixed(2));
                     } else {
                         setResultValue(multiple);
                     }
@@ -89,8 +100,8 @@ const Calculator = () => {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
                         multiple = newInputValue.substring(0, newInputValue.length - 1).split('*').reduce((a, b) => a * b, 1);
                         if (/\./.test(multiple)) {
-                            setInputValue(multiple.toFixed(3) + charNaN);
-                            setResultValue(multiple.toFixed(3));
+                            setInputValue(multiple.toFixed(2) + charNaN);
+                            setResultValue(multiple.toFixed(2));
                         } else {
                             setInputValue(multiple + charNaN);
                             setResultValue(multiple);
@@ -100,22 +111,41 @@ const Calculator = () => {
                 case /\//.test(newInputValue.substring(0, newInputValue.length - 1)):
                     let divide = _.reduce(newInputValue.split('/').filter(x => x.length !== 0), (a, b) => a / b);
                     if (/\./.test(divide)) {
-                        setResultValue(divide.toFixed(3));
+                        setResultValue(divide.toFixed(2));
                     } else {
                         setResultValue(divide);
                     }
-                    if (divide === 'NaN' || Number.isNaN(divide)) {
+                    if (Number.isNaN(divide)) {
                         charNaN = newInputValue.charAt(newInputValue.length - 1);
                         divide = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('/'), (a, b) => a / b);
                         if (/\./.test(divide)) {
-                            setInputValue(divide.toFixed(3) + charNaN);
-                            setResultValue(divide.toFixed(3));
+                            setInputValue(divide.toFixed(2) + charNaN);
+                            setResultValue(divide.toFixed(2));
                         } else {
                             setInputValue(divide + charNaN);
                             setResultValue(divide);
                         }
                     }
                     break;
+                case /\%/.test(newInputValue.substring(0, newInputValue.length - 1)):
+                    let percent = _.reduce(newInputValue.split('%'), (a, b) => a * (b / 100));
+                    if (/\./.test(percent)) {
+                        setResultValue(percent.toFixed(2));
+                    } else {
+                        setResultValue(percent);
+                    }
+                    if (Number.isNaN(percent)) {
+                        charNaN = newInputValue.charAt(newInputValue.length - 1);
+                        percent = _.reduce(newInputValue.substring(0, newInputValue.length - 1).split('%'), (a, b) => a * (b / 100));
+                        if (/\./.test(percent)) {
+                            setInputValue(percent.toFixed(2) + charNaN);
+                            setResultValue(percent.toFixed(2));
+                        } else {
+                            setInputValue(percent + charNaN);
+                            setResultValue(percent);
+                        }
+                    }
+                    break
             }
         }
         else {
@@ -133,11 +163,57 @@ const Calculator = () => {
         }
         if (code === 8) {
             setInputValue(inputValue.toString().substring(0, inputValue.toString().length - 1));
+            let newInputValue = inputValue.toString().substring(0, inputValue.toString().length - 1);
+            setResultValue(newInputValue);
+
+            switch (true) {
+                case /\+/.test(newInputValue):
+                    let sum = newInputValue.split('+').reduce((a, b) => (+a) + (+b), 0);
+                    if (/\./.test(sum)) {
+                        setResultValue(sum.toFixed(2));
+                    } else {
+                        setResultValue(sum);
+                        console.log(newInputValue, 'newInputValue-after-1')
+                    }
+                    break;
+                case /\-/.test(newInputValue):
+                    let sub = _.reduce(newInputValue.split('-'), (a, b) => a - b);
+                    if (/\./.test(sub)) {
+                        setResultValue(sub.toFixed(2));
+                    } else {
+                        setResultValue(sub);
+                    }
+                    break;
+                case /\*/.test(newInputValue):
+                    let multiple = newInputValue.split('*').filter(x => x.length !== 0).reduce((a, b) => a * b, 1);
+                    if (/\./.test(multiple)) {
+                        setResultValue(multiple.toFixed(2));
+                    } else {
+                        setResultValue(multiple);
+                    }
+                    break;
+                case /\//.test(newInputValue):
+                    let divide = _.reduce(newInputValue.split('/').filter(x => x.length !== 0), (a, b) => a / b);
+                    if (/\./.test(divide)) {
+                        setResultValue(divide.toFixed(2));
+                    } else {
+                        setResultValue(divide);
+                    }
+                    break;
+                case /\%/.test(newInputValue):
+                    let percent = _.reduce(newInputValue.split('%'), (a, b) => a * (b / 100));
+                    if (/\./.test(percent)) {
+                        setResultValue(percent.toFixed(2));
+                    } else {
+                        setResultValue(percent);
+                    }
+                    break
+            }
         }
     }
 
     const keyDownHandler = e => {
-        console.log(e.keyCode, 'code')
+        // console.log(e.keyCode, 'code')
         buttonsData.forEach(button => {
             if (e.keyCode === button.code) {
                 inputValueChangeHandler(button.code, button.value)
