@@ -6,7 +6,7 @@ const Input = styled.input.attrs(
             value: props.value,
             type: 'text',
             readOnly: true,
-            maxLength:16
+            // maxLength:16
         })
 )`
   width: 95%;

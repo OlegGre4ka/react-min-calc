@@ -6,6 +6,7 @@ const Button = styled.button`
   background-color: ${props=> props.backgroundColor ? props.backgroundColor : '#fff'};
   font-size: 20px;
   border-color: ${props=>props.borderColor && props.borderColor };
+  border-radius: 5px;
   cursor: pointer;
   margin: 10px;
 

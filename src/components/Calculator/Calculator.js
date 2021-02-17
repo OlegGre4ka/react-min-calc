@@ -45,6 +45,9 @@ const Calculator = () => {
             || newInputValue.slice(0, 2) === '00') {
             newInputValue = newInputValue.substring(0, inputValue.toString().length);
         }
+        if (newInputValue.slice(0, 1) === '.') {
+            newInputValue = newInputValue.replace(/\./, '0.')
+        }
 
         if (val !== '=' && code !== 8) {
 
